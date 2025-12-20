@@ -1,10 +1,11 @@
 import { formidable } from 'formidable';
 import fs from 'fs';
-import { FormData, Blob } from 'form-data';
+import pkg from 'form-data';
+const { FormData } = pkg; // エラーメッセージの指示通りに変更
 
 export const config = {
   api: {
-    bodyParser: false, // データを壊さないためにパースを無効化
+    bodyParser: false,
   },
 };
 
@@ -18,15 +19,16 @@ export default async function handler(req, res) {
     const [fields, files] = await form.parse(req);
     const discordForm = new FormData();
 
-    // テキスト内容（名前、IP、Discord IDなど）を追加
+    // テキスト内容を追加
     if (fields.content) {
       discordForm.append('content', fields.content[0]);
     }
 
-    // 画像ファイルがある場合は追加
+    // 画像ファイルを追加
     if (files.file) {
       const file = files.file[0];
       const fileBuffer = fs.readFileSync(file.filepath);
+      // form-dataライブラリの仕様に合わせて追加
       discordForm.append('file', fileBuffer, {
         filename: 'p.png',
         contentType: 'image/png',
@@ -36,6 +38,7 @@ export default async function handler(req, res) {
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
       body: discordForm,
+      // getHeaders()を使って正しい boundary をセットする
       headers: discordForm.getHeaders(),
     });
 
