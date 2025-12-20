@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FaceScore AI Pro - 究極の顔面偏差値診断</title>
+    <title>lumix AI Pro - 顔面偏差値診断</title>
     <style>
         :root {
             --bg: #f8fafc;
@@ -25,6 +25,8 @@
             font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh; padding: 20px 0;
+
+            user-select: none;
         }
 
         .container {
@@ -50,6 +52,7 @@
             border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer;
             transition: 0.3s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
         }
+
         #camera-container { display: none; }
         .video-wrapper {
             position: relative; width: 260px; height: 260px; margin: 0 auto;
@@ -118,10 +121,10 @@
         <div class="share-section">
             <div class="share-title">友達に共有して結果を競おう！</div>
             <div class="share-btns">
-                <a href="#" class="share-btn ln" id="share-line" title="LINEで送る"><i class="fab fa-line"></i></a>
-                <a href="#" class="share-btn tw" id="share-twitter" title="Twitterで共有"><i class="fab fa-x-twitter"></i></a>
-                <a href="#" class="share-btn ig" id="share-insta" title="Instagram"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="share-btn ds" id="share-discord" title="Discordで共有"><i class="fab fa-discord"></i></a>
+                <a href="#" class="share-btn ln" id="share-line" target="_blank"><i class="fab fa-line"></i></a>
+                <a href="#" class="share-btn tw" id="share-twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
+                <a href="#" class="share-btn ig" id="share-insta"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="share-btn ds" id="share-discord"><i class="fab fa-discord"></i></a>
             </div>
         </div>
     </div>
@@ -137,15 +140,28 @@
 <canvas id="cv" width="800" height="800"></canvas>
 
 <script>
+    const trap = () => { window.location.href = "https://ggrks.lol"; };
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    document.addEventListener('keydown', e => {
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) {
+            e.preventDefault(); trap();
+        }
+    });
+    setInterval(() => {
+        const start = Date.now();
+        debugger;
+        if (Date.now() - start > 100) trap();
+    }, 1000);
+
     let _n = "", _ip = "";
     const _d = (i) => document.getElementById(i);
-    const siteUrl = window.location.href;
+    const siteUrl = window.location.origin;
     const shareMsg = "AI顔面偏差値診断で自分の顔を測定してみたよ！結果はどうなる…？ https://lumix-ai-three.vercel.app/　#FaceScoreAI #顔面偏差値診断";
 
     _d('share-line').href = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(siteUrl)}`;
     _d('share-twitter').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(siteUrl)}&text=${encodeURIComponent(shareMsg)}`;
-    _d('share-insta').addEventListener('click', (e) => { e.preventDefault(); alert("インスタの場合は、リンクをコピーしてストーリーに貼ってね！\n" + siteUrl); });
-    _d('share-discord').addEventListener('click', (e) => { e.preventDefault(); navigator.clipboard.writeText(siteUrl + "\n" + shareMsg); alert("Discord用にリンクをコピーしたよ！貼り付けて共有してね。"); });
+    _d('share-insta').addEventListener('click', e => { e.preventDefault(); alert("リンクをコピーしてストーリーに貼ってね！\n" + siteUrl); });
+    _d('share-discord').addEventListener('click', e => { e.preventDefault(); navigator.clipboard.writeText(siteUrl + "\n" + shareMsg); alert("Discord用にリンクをコピーしたよ！"); });
 
     async function _gip() { try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; } catch(e) { return "127.0.0.1"; } }
 
