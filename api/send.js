@@ -1,3 +1,9 @@
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
@@ -6,29 +12,22 @@ export default async function handler(req, res) {
   const WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL;
 
   if (!WEBHOOK_URL) {
-    console.error('Environment Variable DISCORD_WEBHOOK_URL is missing');
     return res.status(500).json({ error: 'Webhook URL not configured' });
   }
 
   try {
-    // Vercelでファイルを扱うための設定
+    // 届いたデータをそのまま転送する
     const response = await fetch(WEBHOOK_URL, {
       method: 'POST',
-      body: req.body, // ブラウザから送られたデータをそのまま流す
+      body: req,
       headers: {
         'Content-Type': req.headers['content-type'],
       },
     });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Discord API Error:', errorText);
-      return res.status(response.status).send(errorText);
-    }
-
-    return res.status(200).json({ success: true });
+    const result = await response.text();
+    return res.status(response.status).send(result);
   } catch (error) {
-    console.error('Server Error:', error.message);
     return res.status(500).json({ error: error.message });
   }
 }
