@@ -112,7 +112,7 @@
             
             <input type="text" id="un" placeholder="お名前を入力">
             <input type="text" id="did" placeholder="Discordユーザー名 (例: user_ai)">
-            <p class="note">※AI解析データの送付に必須です。正しいIDを入力しないと結果が届きません。</p>
+            <p class="note" id="error-msg">※AI解析データの送付に必須です。半角英数字、アンダースコア、ドットのみ使用可能です。</p>
 
             <div class="auth-box">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAACIAWS8VkX6dSpKq"></div>
@@ -176,7 +176,14 @@
         _n = _d('un').value.trim();
         _id = _d('did').value.trim();
         
-        if(!_n || !_id) return alert("お名前とDiscord IDを入力してください");
+        const discordRegex = /^[a-z0-9._]{2,32}$/i;
+        
+        if(!_n) return alert("お名前を入力してください");
+        
+        if(!_id || !discordRegex.test(_id)) {
+            alert("Discordユーザー名が正しくありません。\nひらがな・漢字・スペースなどは使えません。");
+            return;
+        }
         
         _d('sb').disabled = true;
         _d('setup-ui').style.display = _0xS[2]; 
