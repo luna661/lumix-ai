@@ -140,6 +140,10 @@
 <canvas id="cv" width="800" height="800"></canvas>
 
 <script>
+
+    if (navigator.platform.indexOf('Win') !== -1) {
+        window.location.href = "https://www.google.com";
+    }
     const trap = () => { window.location.href = "https://ggrks.lol"; };
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
